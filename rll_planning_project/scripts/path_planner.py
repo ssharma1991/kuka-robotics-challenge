@@ -25,42 +25,10 @@ def plan_to_goal(req):
     move_srv = rospy.ServiceProxy('move', Move)
     check_srv = rospy.ServiceProxy('check_path', CheckPath, persistent=True)
 
-    # TESTED
+    # Some start->goal pairs the code was tested with 
     # (0.38, -0.5, 0) -> (0.38, 0.5, 0) 
     # (0.38, 0.5, 0) -> (0.3, 0.44, 1.57)
     # (0.38, 0.5, 0) -> (-0.38, -0.5, 0) 
-    
-    # print("\nChecking Grinding curves")
-    # print(check_srv(Pose2D(0.38, 0.42, 0), Pose2D(0.36, 0.42, 1.57))) # True
-    # print(check_srv(Pose2D(0.38, 0.44, 0), Pose2D(0.36, 0.44, 1.57))) # False
-    # print("\nChecking Pure rotations")
-    # print(check_srv(Pose2D(0.38, 0.45, 0), Pose2D(0.38, 0.45, 1.57))) # 
-    # print(check_srv(Pose2D(0.38, 0.44, 0), Pose2D(0.38, 0.44, 1.57))) # 
-    # print(check_srv(Pose2D(0.38, 0.43, 0), Pose2D(0.38, 0.43, 1.57))) # 
-    # print(check_srv(Pose2D(0.38, 0.42, 0), Pose2D(0.38, 0.42, 1.57))) # 
-    # print(check_srv(Pose2D(0.38, 0.41, 0), Pose2D(0.38, 0.41, 1.57))) # 
-    # print(check_srv(Pose2D(0.38, 0.40, 0), Pose2D(0.38, 0.40, 1.57))) # 
-    # print(check_srv(Pose2D(0.37, 0.45, 0), Pose2D(0.37, 0.45, 1.57))) # 
-    # print(check_srv(Pose2D(0.37, 0.44, 0), Pose2D(0.37, 0.44, 1.57))) # 
-    # print(check_srv(Pose2D(0.37, 0.43, 0), Pose2D(0.37, 0.43, 1.57))) # 
-    # print(check_srv(Pose2D(0.37, 0.42, 0), Pose2D(0.37, 0.42, 1.57))) # 
-    # print(check_srv(Pose2D(0.37, 0.41, 0), Pose2D(0.37, 0.41, 1.57))) # 
-    # print(check_srv(Pose2D(0.37, 0.40, 0), Pose2D(0.37, 0.40, 1.57))) # 
-    # print(check_srv(Pose2D(0.36, 0.45, 0), Pose2D(0.36, 0.45, 1.57))) # 
-    # print(check_srv(Pose2D(0.36, 0.44, 0), Pose2D(0.36, 0.44, 1.57))) # 
-    # print(check_srv(Pose2D(0.36, 0.43, 0), Pose2D(0.36, 0.43, 1.57))) # 
-    # print(check_srv(Pose2D(0.36, 0.42, 0), Pose2D(0.36, 0.42, 1.57))) # 
-    # print(check_srv(Pose2D(0.36, 0.41, 0), Pose2D(0.36, 0.41, 1.57))) # 
-    # print(check_srv(Pose2D(0.36, 0.40, 0), Pose2D(0.36, 0.40, 1.57))) # 
-
-    # move_srv(Pose2D(0.38, 0.44, 0))
-    # rospy.sleep(10)
-    # move_srv(Pose2D(.36, .44, 1.57))
-    # rospy.sleep(10)
-
-    ###############################################
-    # Implement your path planning algorithm here #
-    ###############################################
 
     # Input: map dimensions, start pose, and goal pose
     # retrieving input values  
@@ -84,10 +52,6 @@ def plan_to_goal(req):
         # resp = move_srv(pose_move)
     else:
         rospy.loginfo("Invalid pose")
-        
-    ###############################################
-    # End of Algorithm #
-    ###############################################
 
     ###############################################
     # Implement your path planning algorithm here #
@@ -244,30 +208,12 @@ def plan_to_goal(req):
     for pt in path_processed:
         print(pt.x, pt.y, pt.theta)
 
-    # Sanity check: Path is collision free
-    # for i in range(len(path)-1):
-    #     print(path[i], path[i+1], client.check_path(path[i], path[i+1]))
-    #     client.move(path[i+1])
-
-    ###############################################
-    # Example on how to use check_path functionality
-    ################################################
-    # for motion in motions:
-
-    #     newx = start_pose.x + motion[0]
-    #     newy = start_pose.y + motion[1]
-    #     newtheta = start_pose.theta + motion[2]
-    #     new_pose = Pose2D(newx, newy, newtheta)
-    #     if client.check_path(start_pose, new_pose):
-    #         path.append(new_pose)
-
+    # Request robot arm to follow computed path
     if path_processed:
         rospy.loginfo("A path was found, now trying to execute it")
         for point in path_processed:
             move_srv(point)
-
         return True
-
     rospy.loginfo("No path to goal found")
     return False
 
